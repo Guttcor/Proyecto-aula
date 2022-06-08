@@ -1,0 +1,381 @@
+#include <Servo.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27,20,4); /////Si no funciona utilizar la direccion 0x27////
+#define BLUE 6
+#define GREEN 10
+#define RED 111
+int TIEMPO_COLOR=500;
+int TIEMPO_BN=200;
+int RESET =7;
+int COLOR;
+int TONALIDAD;
+int RT=0;
+////////////Bombas//////////
+int AM=2;
+int R=3;
+int AZ=4;
+int NE=5;
+int BL=6;
+///////////Led RGB////////////
+int redValue;
+int greenValue;
+int blueValue;
+///////////Joystick///////////
+int X;
+int Y;
+int PULSADOR=8;
+int SW=0;
+////////////SERVO///////////
+Servo servo1;
+int servoPin = 9;
+void AVANZAR(){
+  servo1.write(0);
+  delay(292);
+  servo1.write(90);
+  delay(100);
+}
+  
+void REGRESAR(){
+    servo1.write(180);
+  delay(292);
+  servo1.write(90);
+  delay(1000);
+}
+void RGB () {
+  analogWrite(GREEN, greenValue);
+  analogWrite(BLUE, blueValue);
+  analogWrite(RED, redValue);
+} 
+
+void AMARILLO(){
+  AVANZAR();
+  AVANZAR();
+  digitalWrite(AM,HIGH);
+  delay(TIEMPO_COLOR);
+  digitalWrite(AM,LOW);
+  REGRESAR();
+  REGRESAR();
+}
+void ROJO ()
+{ digitalWrite(R,HIGH);
+  delay(TIEMPO_COLOR);
+  digitalWrite(R,LOW);
+}
+void AZUL()
+{ 
+  AVANZAR();
+  digitalWrite(AZ,HIGH);
+  delay(TIEMPO_COLOR);
+  digitalWrite(AZ,LOW);
+  REGRESAR();
+}
+
+void BLANCO()
+{ 
+  AVANZAR();
+  AVANZAR();
+  AVANZAR();
+  digitalWrite(BL,HIGH);
+  delay(TIEMPO_BN);
+  digitalWrite(BL,LOW);
+  REGRESAR();
+  REGRESAR();
+  REGRESAR();
+}
+void NEGRO()
+{ REGRESAR();
+  digitalWrite(NE,HIGH);
+  delay(TIEMPO_BN);
+  digitalWrite(NE,LOW);
+  AVANZAR();
+}
+
+void setup () 
+{
+  Serial.begin(9600);
+  pinMode(RED, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+  pinMode(BLUE, OUTPUT);
+  
+  pinMode (AM, OUTPUT);
+  pinMode (R, OUTPUT);
+  pinMode (AZ, OUTPUT);  
+  pinMode (NE, OUTPUT);
+  pinMode (BL, OUTPUT);
+  pinMode (PULSADOR, INPUT); 
+  pinMode (RESET, INPUT);
+  ///CONFIGURACION LCD///
+  lcd.init();
+  lcd.backlight();
+  lcd.print("Hola c:");
+  lcd.setCursor(0, 1);
+  lcd.print(" Que pintaremos hoy?");
+  servo1.attach(servoPin);
+  ///////REVISAR SI SI CABEN O HAY QUE MODIFICAR EL ESPACIO///////////
+}
+/*void TON()
+  {
+  /*GUIA DE VALORES PARA TONALIDAD{
+  0=COLOR NATURAL
+  1=ACLARAR
+  2=OBSCURECER
+  
+  if (PULSADOR,HIGH);
+  {
+    TONALIDAD=0;
+  }
+  if(Y >= 0 && Y < 480)
+  {
+    ESCRIBIR();
+    lcd.print("ACLARAR");
+    delay(100);
+    if(PULSADOR,HIGH);
+    {
+      TONALIDAD=1;
+    }
+  }
+  if(Y > 520 && Y <= 1023)
+  {
+    ESCRIBIR();
+    lcd.print("OBSCURECER");
+    delay(100);
+    if(PULSADOR,HIGH);
+    {
+      TONALIDAD=2;
+    }
+  }
+  }*/
+void loop() 
+{
+  RT = digitalRead(RESET);
+  SW = digitalRead(PULSADOR);  
+  X = analogRead(A0);
+  Y = analogRead(A1);
+   Serial.print("X:" );
+   Serial.print(X);
+   Serial.print(" | Y: ");
+   Serial.print(Y);
+   Serial.print(" | Pulsador: ");
+   Serial.println(SW);
+   Serial.println(COLOR);
+   Serial.println(RT);
+
+  if(X >= 0 && X  <=100 &&  Y <=  100)
+  {
+    redValue = 255;
+    greenValue = 255;
+    blueValue = 0;  
+    RGB();
+    lcd.print("AMARILLO");
+    delay(100);
+    COLOR=1;
+  }
+    if(X >= 200 && X <= 600  &&  Y<=100)
+      {
+        redValue = 0;
+        greenValue = 0;
+        blueValue = 255;  
+        RGB();
+        lcd.print("ROJO");
+        delay(100);
+        COLOR=2;
+      }
+    if(X >= 600 && X <= 1022  &&  Y<=100)
+      {
+        redValue = 0;
+        greenValue = 0;
+        blueValue = 255;  
+        RGB();
+        lcd.print("AZUL");
+        delay(100);
+        COLOR=3;
+      }
+    if(X >= 0 && X  <=100 &&  Y >= 800)
+      {
+        redValue = 255;
+        greenValue = 128;
+        blueValue = 0;  
+        RGB();
+        lcd.print("NARANJA");
+        delay(100);
+        COLOR=4;
+       }
+    if(X >= 200 && X <= 600  &&  Y>=800)
+      {
+        redValue = 127;
+        greenValue = 0;
+        blueValue = 255;  
+        RGB();
+        lcd.print("VIOLETA");
+        delay(100);
+        COLOR=5;
+      }
+     if(X >= 700 && X <= 1022  &&  Y>=800)
+      {
+        redValue = 0;
+        greenValue = 255;
+        blueValue = 0;  
+        RGB();
+        lcd.print("VERDE");
+        delay(100);
+        COLOR=6;
+      }
+//////////////////////////////////////////////////////////////////////////
+    
+    if(RT==1)
+    {
+           if(X >= 0 && X  <=100 &&  Y <=  100)
+              {
+                redValue = 255;
+                greenValue = 190;                
+                blueValue = 0;  
+                RGB();
+                lcd.print("NARANJAMARILLO");
+                delay(100);
+                COLOR=7;
+              }
+            if(X >= 200 && X <= 600  &&  Y<=100)
+              {
+                redValue = 255;
+                greenValue = 90;
+                blueValue = 0;  
+                RGB();
+                lcd.print("NARANJAROJIZO");
+                delay(100);
+                COLOR=8;
+              }
+            if(X >= 600 && X <= 1022  &&  Y<=100)
+              {
+                redValue = 185;
+                greenValue = 0;
+                blueValue = 255;  
+                RGB();
+                lcd.print("VIOLETAROJIZO");
+                delay(100);
+                COLOR=9;
+              }
+            if(X >= 0 && X  <=100 &&  Y >= 800)
+              {
+                redValue = 90;
+                greenValue = 0;
+                blueValue = 255;  
+                RGB();
+                lcd.print("VIOLETAZULADO");
+                delay(100);
+                COLOR=10;
+              }
+            if(X >= 200 && X <= 600  &&  Y>=800)
+              {
+                redValue = 0;
+                greenValue = 255;
+                blueValue = 130;  
+                RGB();
+                lcd.print("VERDEAZULADO");
+                delay(100);
+                COLOR=11;
+              }
+              if(X >= 700 && X <= 1022  &&  Y>=800)
+              {
+                redValue = 190;
+                greenValue = 255;
+                blueValue = 0;  
+                RGB();
+                lcd.print("VERDEAMARILLO");
+                delay(100);
+                COLOR=12;
+              }
+  }
+
+if(COLOR==1 && SW==1){
+  AMARILLO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==2 && SW==1){
+  ROJO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==3 && SW==1){
+  AZUL();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==4 && SW==1){
+  AMARILLO();
+  ROJO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==5 && SW==1){
+  AZUL();
+  ROJO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==6 && SW==1){
+  AZUL();
+  AMARILLO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==7 && SW==1){
+  AMARILLO();
+  ROJO();
+  AMARILLO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==8 && SW==1){
+  ROJO();
+  AMARILLO();
+  ROJO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==9 && SW==1){
+  ROJO();
+  AZUL();
+  ROJO();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==10 && SW==1){
+  AZUL();
+  ROJO();
+  AZUL();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==11 && SW==1){
+  AZUL();
+  AMARILLO();
+  AZUL();
+  delay(100);
+  COLOR=0;
+  }
+  if(COLOR==12 && SW==1){
+  AMARILLO();
+  AZUL();
+  AMARILLO();
+  delay(100);
+  COLOR=0;
+  }
+
+}
+/*
+EL VALOR DE COLOR
+1=AMARILLO
+2=ROJO
+3=AZUL
+4=NARANJA
+5=VIOLETA
+6=VERDE
+7=NARANJAMARILLO
+8=NARANJAROJIZO
+9=VIOLETAROJIZO
+10=VIOLETAZULADO
+11=VERDEAZULADO
+12=VERDEAMARILLO
+  */
